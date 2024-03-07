@@ -12,11 +12,11 @@ def parse_coverage_xml(xml_file_path):
         'packages': []
     }
 
-    total_lines = root.get('lines')
+    total_lines = root.get('lines-valid')
     if total_lines is not None:
         summary['total_lines'] = int(total_lines)
 
-    covered_lines = root.get('covered')
+    covered_lines = root.get('lines-covered')
     if covered_lines is not None:
         summary['covered_lines'] = int(covered_lines)
 
@@ -33,18 +33,6 @@ def parse_coverage_xml(xml_file_path):
             'files': []
         }
 
-        total_lines = package.get('lines')
-        if total_lines is not None:
-            package_data['total_lines'] = int(total_lines)
-
-        covered_lines = package.get('covered')
-        if covered_lines is not None:
-            package_data['covered_lines'] = int(covered_lines)
-
-        coverage_percentage = package.get('line-rate')
-        if coverage_percentage is not None:
-            package_data['coverage_percentage'] = float(coverage_percentage) * 100
-
         for source_file in package.iter('class'):
             file_data = {
                 'name': source_file.get('name'),
@@ -53,11 +41,11 @@ def parse_coverage_xml(xml_file_path):
                 'coverage_percentage': 0
             }
 
-            total_lines = source_file.get('lines')
+            total_lines = source_file.get('lines-valid')
             if total_lines is not None:
                 file_data['total_lines'] = int(total_lines)
 
-            covered_lines = source_file.get('covered')
+            covered_lines = source_file.get('lines-covered')
             if covered_lines is not None:
                 file_data['covered_lines'] = int(covered_lines)
 
@@ -66,6 +54,20 @@ def parse_coverage_xml(xml_file_path):
                 file_data['coverage_percentage'] = float(coverage_percentage) * 100
 
             package_data['files'].append(file_data)
+
+        total_lines = package.get('lines-valid')
+        if total_lines is not None:
+            package_data['total_lines'] = int(total_lines)
+
+        covered_lines = package.get('lines-covered')
+        if covered_lines is not None:
+            package_data['covered_lines'] = int(covered_lines)
+
+        coverage_percentage = package.get('line-rate')
+        if coverage_percentage is not None:
+            package_data['coverage_percentage'] = float(coverage_percentage) * 100
+
+        
 
         summary['packages'].append(package_data)
 
