@@ -1,0 +1,108 @@
+name: "GitHub Action for Pytest and Pytest Coverage Report"
+description: "GitHub action will generate Action's Job Summary report with Pytest details and Pytest-Coverage details. It will block PR if test and coverage report fails."
+
+branding:
+  color: "blue"
+  icon: "bar-chart"
+
+inputs:
+  pytest_results_file:
+    description: "Path for pytest results file"
+    required: true
+  
+  pytest_cov_file:
+    description: "Path for pytest-coverage report file"
+    required: false
+    default: "NONE"
+
+  pytest_results_add_to_job_summary:
+    description: "Add pytest results to GitHub Action's Job Summary"
+    required: false
+    default: true
+
+  pytest_cov_add_to_job_summary:
+    description: "Add pytest-coverage report to GitHub Action's Job Summary"
+    required: false
+    default: true
+
+  pytest_results_pr_status_update:
+    description: "Update PR status based on results from pytest results"
+    required: false
+    default: true
+
+  pytest_cov_pr_status_update:
+    description: "Fail the PR and show Failure status on summary report when overall coverage is below threshold. This is uses pytest_cov_failure_threshold parameter as threshold if the coverage is below the threshold."
+    required: false
+    default: true
+
+  pytest_cov_failure_threshold:
+    description: "Fail the coverage report if coverage percentage is below this threshold."
+    required: false
+    default: 70
+
+  my_github_token:
+    description: "GitHub Secret Token to automatically create Pull request with changes. (Make sure to put it in the Repo secret on GitHub as `MY_GITHUB_TOKEN` and then use it like `{{ secrets.MY_GITHUB_TOKEN }}`. Do not write it in plain text.)"
+    required: false
+    default: "NONE"
+
+
+outputs:
+  stdout:
+    description: "Program stdout"
+  stderr:
+    description: "Program stderr"
+  error:
+    description: "A string of 'true' or 'false' that tells if there were errors."
+
+runs:
+  using: "composite"
+  steps:
+    - name: "Extracting the current branch name"
+      shell: bash
+      run: echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_OUTPUT
+      id: extract_branch
+
+    - name: "Clone the Repository"
+      uses: actions/checkout@v4
+      with:
+        ref: ${{ steps.extract_branch.outputs.branch }}
+        path: repodir
+
+    - name: "Pre-tasks"
+      shell: bash
+      run: |
+        pwd
+        echo "=== Inputs ==="
+        echo "pytest_results_file -> ${{inputs.pytest_results_file}}"
+        echo "pytest_cov_file -> ${{inputs.pytest_cov_file}}"
+        echo "pytest_results_add_to_job_summary -> ${{inputs.pytest_results_add_to_job_summary}}"
+        echo "pytest_cov_add_to_job_summary -> ${{inputs.pytest_cov_add_to_job_summary}}"
+        echo "pytest_results_pr_status_update -> ${{inputs.pytest_results_pr_status_update}}"
+        echo "pytest_cov_pr_status_update -> ${{inputs.pytest_cov_pr_status_update}}"
+        echo "pytest_cov_failure_threshold -> ${{inputs.pytest_cov_failure_threshold}}"
+        echo "my_github_token -> ${{inputs.my_github_token}} (If using Github secret the value will be ***)"
+
+    - name: "Install Python"
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.11'
+
+    - name: "Install required packages"
+      shell: bash
+      run: |
+        pip install requests
+        pip install splunk-add-on-ucc-framework
+
+    - name: "Running the Splunk App actions"
+      shell: bash
+      env:
+        PYTEST_pytest_results_file: ${{inputs.pytest_results_file}}
+        PYTEST_pytest_cov_file: ${{inputs.pytest_cov_file}}
+        PYTEST_pytest_results_add_to_job_summary: ${{inputs.pytest_results_add_to_job_summary}}
+        PYTEST_pytest_cov_add_to_job_summary: ${{inputs.pytest_cov_add_to_job_summary}}
+        PYTEST_pytest_results_pr_status_update: ${{inputs.pytest_results_pr_status_update}}
+        PYTEST_pytest_cov_pr_status_update: ${{inputs.pytest_cov_pr_status_update}}
+        PYTEST_pytest_cov_failure_threshold: ${{inputs.pytest_cov_failure_threshold}}
+        GITHUB_TOKEN: ${{inputs.my_github_token}}
+      run: |
+        python -u ${{ github.action_path }}/src/main.py
