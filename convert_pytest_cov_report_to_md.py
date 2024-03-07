@@ -26,19 +26,24 @@ def parse_coverage_xml(xml_file_path):
 
     for package in root.iter('package'):
         package_name = package.attrib['name']
-        summary['packages'][package_name] = {
-            "total_lines": 0,
-            "covered_lines": 0
-        }
-        package_dict = summary['packages'][package_name]
 
-        for source_file in package.iter('class'):
-            file_name = source_file.attrib['filename']
-            package_dict['files'] = {}
-            package_dict['files'][file_name] = {
+        if package_name not in summary['packages']:
+            summary['packages'][package_name] = {
                 "total_lines": 0,
                 "covered_lines": 0
             }
+        package_dict = summary['packages'][package_name]
+
+        for source_file in package.iter('class'):
+            if 'files' not in package_dict:
+                package_dict['files'] = {}
+
+            file_name = source_file.attrib['filename']
+            if file_name not in package_dict['files']:
+                package_dict['files'][file_name] = {
+                    "total_lines": 0,
+                    "covered_lines": 0
+                }
             file_dict = package_dict['files'][file_name]
 
             for line in source_file.iter('line'):
@@ -72,14 +77,14 @@ def generate_readme(summary):
 
     readme += "## Packages\n\n"
     readme += "| Package | File | Total Lines | Covered Lines | Coverage Percentage |\n"
-    readme += "|---------|-------------|-------------|---------------|----------------------|\n"
+    readme += "|:---------|:-------------|-------------:|---------------:|----------------------:|\n"
     for package_name in summary['packages']:
-        readme += f"| {package_name} | - | "\
-            f"{summary['packages'][package_name]['total_lines']} | {summary['packages'][package_name]['covered_lines']} | "\
-            f"{summary['packages'][package_name]['coverage_percentage']:.2f}% |\n"
+        readme += f"| **{package_name}** | | "\
+            f"**{summary['packages'][package_name]['total_lines']}** | **{summary['packages'][package_name]['covered_lines']}** | "\
+            f"**{summary['packages'][package_name]['coverage_percentage']:.2f}%** |\n"
 
         for file_name in summary['packages'][package_name]['files']:
-            readme += f"| {package_name} | {file_name} | "\
+            readme += f"| | {file_name} | "\
             f"{summary['packages'][package_name]['files'][file_name]['total_lines']} | {summary['packages'][package_name]['files'][file_name]['covered_lines']} | "\
             f"{summary['packages'][package_name]['files'][file_name]['coverage_percentage']:.2f}% |\n"
 
