@@ -9,7 +9,7 @@ def parse_coverage_xml(xml_file_path):
         'total_lines': 0,
         'covered_lines': 0,
         'coverage_percentage': 0,
-        'packages': []
+        'packages': {}
     }
 
     total_lines = root.get('lines-valid')
@@ -25,51 +25,41 @@ def parse_coverage_xml(xml_file_path):
         summary['coverage_percentage'] = float(coverage_percentage) * 100
 
     for package in root.iter('package'):
-        package_data = {
-            'name': package.get('name'),
-            'total_lines': 0,
-            'covered_lines': 0,
-            'coverage_percentage': 0,
-            'files': []
+        package_name = package.attrib['name']
+        summary['packages'][package_name] = {
+            "total_lines": 0,
+            "covered_lines": 0
         }
+        package_dict = summary['packages'][package_name]
 
         for source_file in package.iter('class'):
-            file_data = {
-                'name': source_file.get('name'),
-                'total_lines': 0,
-                'covered_lines': 0,
-                'coverage_percentage': 0
+            file_name = source_file.attrib['filename']
+            package_dict['files'] = {}
+            package_dict['files'][file_name] = {
+                "total_lines": 0,
+                "covered_lines": 0
             }
+            file_dict = package_dict['files'][file_name]
 
-            total_lines = source_file.get('lines-valid')
-            if total_lines is not None:
-                file_data['total_lines'] = int(total_lines)
+            for line in source_file.iter('line'):
+                line_number = int(line.attrib['number'])
+                hits = int(line.attrib['hits'])
 
-            covered_lines = source_file.get('lines-covered')
-            if covered_lines is not None:
-                file_data['covered_lines'] = int(covered_lines)
+                file_dict['total_lines'] += 1
+                package_dict['total_lines'] += 1
 
-            coverage_percentage = source_file.get('line-rate')
-            if coverage_percentage is not None:
-                file_data['coverage_percentage'] = float(coverage_percentage) * 100
+                if hits > 0:
+                    file_dict['covered_lines'] += 1
+                    package_dict['covered_lines'] += 1
 
-            package_data['files'].append(file_data)
 
-        total_lines = package.get('lines-valid')
-        if total_lines is not None:
-            package_data['total_lines'] = int(total_lines)
-
-        covered_lines = package.get('lines-covered')
-        if covered_lines is not None:
-            package_data['covered_lines'] = int(covered_lines)
-
-        coverage_percentage = package.get('line-rate')
-        if coverage_percentage is not None:
-            package_data['coverage_percentage'] = float(coverage_percentage) * 100
-
-        
-
-        summary['packages'].append(package_data)
+    for package in summary['packages']:
+        summary['packages'][package]['coverage_percentage'] = \
+            float(summary['packages'][package]['covered_lines'] / summary['packages'][package]['total_lines']) * 100
+    
+        for source_file in summary['packages'][package]['files']:
+            summary['packages'][package]['files'][source_file]['coverage_percentage'] = \
+                float(summary['packages'][package]['files'][source_file]['covered_lines'] / summary['packages'][package]['files'][source_file]['total_lines']) * 100
 
     return summary
 
@@ -83,9 +73,15 @@ def generate_readme(summary):
     readme += "## Packages\n\n"
     readme += "| Package | File | Total Lines | Covered Lines | Coverage Percentage |\n"
     readme += "|---------|-------------|-------------|---------------|----------------------|\n"
-    for package in summary['packages']:
-        for source_file in package['files']:
-            readme += f"| {package['name']} | {source_file['name']} | {source_file['total_lines']} | {source_file['covered_lines']} | {source_file['coverage_percentage']:.2f}% |\n"
+    for package_name in summary['packages']:
+        readme += f"| {package_name} | - | "\
+            f"{summary['packages'][package_name]['total_lines']} | {summary['packages'][package_name]['covered_lines']} | "\
+            f"{summary['packages'][package_name]['coverage_percentage']:.2f}% |\n"
+
+        for file_name in summary['packages'][package_name]['files']:
+            readme += f"| {package_name} | {file_name} | "\
+            f"{summary['packages'][package_name]['files'][file_name]['total_lines']} | {summary['packages'][package_name]['files'][file_name]['covered_lines']} | "\
+            f"{summary['packages'][package_name]['files'][file_name]['coverage_percentage']:.2f}% |\n"
 
     return readme
 
