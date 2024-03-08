@@ -1,5 +1,5 @@
-name: "GitHub Action for Pytest and Pytest Coverage Report"
-description: "GitHub action will generate Action's Job Summary report with Pytest details and Pytest-Coverage details. It will block PR if test and coverage report fails."
+name: "GitHub Action to add for Pytest and Pytest Coverage Report in GitHub Action Summary"
+description: "GitHub action will generate Action's Job Summary report with Pytest details and Pytest-Coverage details."
 
 branding:
   color: "blue"
@@ -7,11 +7,11 @@ branding:
 
 inputs:
   pytest_results_file:
-    description: "Path for pytest results file"
+    description: "Path for pytest results file. This has to be a pytest results file in XML format."
     required: true
   
   pytest_cov_file:
-    description: "Path for pytest-coverage report file"
+    description: "Path for pytest-coverage report file. This has to be a pytest coverage report file in XML format."
     required: false
     default: "NONE"
 
