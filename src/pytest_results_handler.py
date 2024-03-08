@@ -81,11 +81,11 @@ def generate_readme(summary, show_passing_test_cases=False):
             if test_case['result'] == 'failed':
                 # readme += f"\t* Failure Message: {test_case['failure_message']}\n"
                 # readme += f"\t* Failure Traceback:\n```\n{test_case['failure_traceback']}\n```\n"
-                readme += f"\n```\n{test_case['failure_traceback']}\n```\n"
+                readme += f"\n```\n{test_case['failure_traceback']}\n```\n\n"
             elif test_case['result'] == 'error':
                 # readme += f"\t* Error Message: {test_case['error_message']}\n"
                 # readme += f"\t* Error Traceback:\n```\n{test_case['error_traceback']}\n```\n"
-                readme += f"\n```\n{test_case['error_traceback']}\n```\n"
+                readme += f"\n```\n{test_case['error_traceback']}\n```\n\n"
 
     readme += "\n\n"
 
