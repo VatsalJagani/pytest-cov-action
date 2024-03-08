@@ -90,10 +90,9 @@ runs:
     - name: "Install required packages"
       shell: bash
       run: |
-        pip install requests
-        pip install splunk-add-on-ucc-framework
+        pip install pytest
 
-    - name: "Running the Splunk App actions"
+    - name: "Running the GitHub action for pytest and pytest-cov reports."
       shell: bash
       env:
         PYTEST_pytest_results_file: ${{inputs.pytest_results_file}}
