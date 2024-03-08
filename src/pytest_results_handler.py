@@ -46,7 +46,7 @@ def parse_pytest_xml(xml_file_path):
     return summary
 
 
-def generate_readme(summary):
+def generate_readme(summary, show_passing_test_cases=False):
     readme = f"# Pytest Summary\n\n"
     readme += f":information_source: Total Tests: {summary['total_tests']}\n"
     readme += f":white_check_mark: Passed Tests: {summary['passed_tests']}\n"
@@ -55,13 +55,16 @@ def generate_readme(summary):
     readme += f":heavy_exclamation_mark: Skipped Tests: {summary['skipped_tests']}\n"
     readme += f":clock1130: Total Time: {summary['total_time']:.2f} seconds\n\n"
 
-    readme += "#### Passed Test-Cases\n\n"
+    if show_passing_test_cases:
+        readme += "#### Passed Test-Cases\n\n"
 
-    readme += "| Test-Case | Duration (sec) |\n"
-    readme += "|:---------|----------:|\n"
-    for test_case in summary['test_cases']:
-        if test_case['result'].lower() == "passed":
-            readme += f"| {test_case['name']} | {test_case['duration']:.2f} |\n"
+        readme += "| Test-Case | Duration (sec) |\n"
+        readme += "|:---------|----------:|\n"
+        for test_case in summary['test_cases']:
+            if test_case['result'].lower() == "passed":
+                readme += f"| {test_case['name']} | {test_case['duration']:.2f} |\n"
+
+        readme += "\n"
 
 
     if float(summary['failed_tests']) + float(summary['errors'] + float(summary['skipped_tests'])) > 0:
@@ -87,9 +90,9 @@ def generate_readme(summary):
     return readme
 
 
-def generate_md_summary(pytest_results_file):
+def generate_md_summary(pytest_results_file, show_passing_test_cases=False):
     summary = parse_pytest_xml(pytest_results_file)
-    return generate_readme(summary)
+    return generate_readme(summary, show_passing_test_cases=show_passing_test_cases)
 
 
 def is_passed(pytest_results_file):

@@ -30,11 +30,16 @@ if __name__ == "__main__":
     pytest_cov_failure_threshold = float(utils.get_input('pytest_cov_failure_threshold'))
     utils.info("pytest_cov_failure_threshold: {}".format(pytest_cov_failure_threshold))
 
+    show_passing_test_cases = utils.str_to_boolean_default_false(
+        utils.get_input('show_passing_test_cases')
+    )
+    utils.info(f"show_passing_test_cases: {show_passing_test_cases}")
+
 
     # Pytest Results
     is_pytest_passed = pytest_results_handler.is_passed(pytest_results_file)
     print(f"is_pytest_passed = {is_pytest_passed}")
-    pytest_results_job_summary = pytest_results_handler.generate_md_summary(pytest_results_file)
+    pytest_results_job_summary = pytest_results_handler.generate_md_summary(pytest_results_file, show_passing_test_cases=show_passing_test_cases)
     utils.write_msg_to_step_summary(pytest_results_job_summary)
 
     # Pytest Coverage Report

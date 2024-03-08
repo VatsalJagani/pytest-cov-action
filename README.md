@@ -49,6 +49,11 @@ GitHub Action to add for Pytest and Pytest Coverage Report in GitHub Action Summ
 * required: false
 * default: 70
 
+### show_passing_test_cases:
+* description: "Enable this input parameter if you wish to show list of all test-cases which has passed."
+* required: false
+* default: false
+
 
 
 ## See Examples Here

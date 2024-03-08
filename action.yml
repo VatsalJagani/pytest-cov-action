@@ -30,6 +30,11 @@ inputs:
     required: false
     default: 70
 
+  show_passing_test_cases:
+    description: "Enable this input parameter if you wish to show list of all test-cases which has passed."
+    required: false
+    default: false
+
 
 outputs:
   stdout:
@@ -63,6 +68,7 @@ runs:
         echo "pytest_results_add_to_job_summary -> ${{inputs.pytest_results_add_to_job_summary}}"
         echo "pytest_cov_add_to_job_summary -> ${{inputs.pytest_cov_add_to_job_summary}}"
         echo "pytest_cov_failure_threshold -> ${{inputs.pytest_cov_failure_threshold}}"
+        echo "show_passing_test_cases -> ${{inputs.show_passing_test_cases}}"
 
     - name: "Install Python"
       uses: actions/setup-python@v5
@@ -77,5 +83,6 @@ runs:
         PYTEST_pytest_results_add_to_job_summary: ${{inputs.pytest_results_add_to_job_summary}}
         PYTEST_pytest_cov_add_to_job_summary: ${{inputs.pytest_cov_add_to_job_summary}}
         PYTEST_pytest_cov_failure_threshold: ${{inputs.pytest_cov_failure_threshold}}
+        PYTEST_show_passing_test_cases: ${{inputs.show_passing_test_cases}}
       run: |
         python -u ${{ github.action_path }}/src/main.py
