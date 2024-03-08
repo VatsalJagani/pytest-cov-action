@@ -91,16 +91,10 @@ def generate_readme(summary):
     return readme
 
 
-if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print("Usage: python coverage_summary.py <path_to_xml_file>")
-        sys.exit(1)
+def get_overall_cov(pytest_cov_report_file):
+    summary = parse_coverage_xml(pytest_cov_report_file)
+    return summary['coverage_percentage']
 
-    xml_file_path = sys.argv[1]
-    summary = parse_coverage_xml(xml_file_path)
-    readme_content = generate_readme(summary)
-
-    with open('coverage_summary.md', 'w') as readme_file:
-        readme_file.write(readme_content)
-
-    print(f"Summary written to 'coverage_summary.md'")
+def generate_md_summary(pytest_cov_report_file):
+    summary = parse_coverage_xml(pytest_cov_report_file)
+    return generate_readme(summary)

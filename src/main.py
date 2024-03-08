@@ -8,6 +8,7 @@ sys.path.append(os.path.dirname(__file__))
 
 import helpers.github_action_utils as utils
 import pytest_results_handler
+import pytest_cov_report_handler
 
 
 
@@ -44,8 +45,10 @@ if __name__ == "__main__":
 
     # Pytest Results
     is_pytest_passed = pytest_results_handler.is_passed(pytest_results_file)
-    job_summary = pytest_results_handler.generate_md_summary(pytest_results_file)
-    utils.write_msg_to_step_summary(job_summary)
+    pytest_results_job_summary = pytest_results_handler.generate_md_summary(pytest_results_file)
+    utils.write_msg_to_step_summary(pytest_results_job_summary)
 
     # Pytest Coverage Report
-
+    pytest_cov = pytest_cov_report_handler.get_overall_cov(pytest_cov_file)
+    pytest_cov_job_summary = pytest_cov_report_handler.generate_md_summary(pytest_cov_file)
+    utils.write_msg_to_step_summary(pytest_cov_job_summary)
