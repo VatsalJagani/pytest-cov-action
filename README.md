@@ -8,17 +8,19 @@ GitHub Action to add for Pytest and Pytest Coverage Report in GitHub Action Summ
 
 * Example-1
     ```
-    - uses: VatsalJagani/pytest-cov-action@v0.1
+    - uses: VatsalJagani/pytest-cov-action@v0.4
       with:
         pytest_results_file: "junit/test-results.xml"
         pytest_cov_file: "junit/coverage.xml"
+      if: ${{ always() }}
     ```
 
 * Example-2 - Coverage report is optional
     ```
-    - uses: VatsalJagani/pytest-cov-action@v0.1
+    - uses: VatsalJagani/pytest-cov-action@v0.4
       with:
         pytest_results_file: "test-results.xml"
+      if: ${{ always() }}
     ```
 
 
@@ -58,6 +60,32 @@ GitHub Action to add for Pytest and Pytest Coverage Report in GitHub Action Summ
 
 ## See Examples Here
 * [Public GitHub Repository using this Action](https://github.com/VatsalJagani/pytest-cov-action/network/dependents)
+
+
+## Troubleshooting
+* GitHub action failing even though all test-cases are passing.
+    * **Issue** - It could be most likely due to default value of `pytest_cov_failure_threshold` is `70%`. If your test-coverage is lower than that, it would fail the GitHub action.
+    * **Solution** - If you don't care about pytest-coverage you can change the input `pytest_cov_failure_threshold` to `0` in order to avoid this error.
+        ```
+        - uses: VatsalJagani/pytest-cov-action@v0.4
+          with:
+            pytest_results_file: "junit/test-results.xml"
+            pytest_cov_file: "junit/coverage.xml"
+            pytest_cov_failure_threshold: 0
+          if: ${{ always() }}
+        ```
+
+* There are no summaries being added on GitHub action step
+    * **Issue** - No summaries being added to GitHub action's summary even though test-cases are being executed properly.
+    * **Solution** - If test-cases are failing and you forgot to add `if: ${{ always() }}` in actions' parameter, the action would not be executed because some test have failed. So add it like:
+        ```
+        - uses: VatsalJagani/pytest-cov-action@v0.4
+          with:
+            pytest_results_file: "junit/test-results.xml"
+            pytest_cov_file: "junit/coverage.xml"
+          if: ${{ always() }}
+        ```
+
 
 
 ## Release Notes
