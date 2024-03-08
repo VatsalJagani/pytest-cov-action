@@ -1,5 +1,5 @@
 import xml.etree.ElementTree as ET
-import sys
+
 
 def parse_pytest_xml(xml_file_path):
     tree = ET.parse(xml_file_path)
@@ -71,16 +71,14 @@ def generate_readme(summary):
 
     return readme
 
-if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print("Usage: python pytest_summary.py <path_to_xml_file>")
-        sys.exit(1)
 
-    xml_file_path = sys.argv[1]
-    summary = parse_pytest_xml(xml_file_path)
-    readme_content = generate_readme(summary)
+def generate_md_summary(pytest_results_file):
+    summary = parse_pytest_xml(pytest_results_file)
+    return generate_readme(summary)
 
-    with open('pytest_summary.md', 'w') as readme_file:
-        readme_file.write(readme_content)
 
-    print(f"Summary written to 'pytest_summary.md'")
+def is_passed(pytest_results_file):
+    summary = parse_pytest_xml(pytest_results_file)
+    if summary['failed_tests'] == 0:
+        return True
+    return False

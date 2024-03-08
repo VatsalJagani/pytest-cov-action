@@ -7,6 +7,7 @@ import traceback
 sys.path.append(os.path.dirname(__file__))
 
 import helpers.github_action_utils as utils
+import pytest_results_handler
 
 
 
@@ -40,7 +41,11 @@ if __name__ == "__main__":
         utils.get_input('pytest_cov_failure_threshold'))
     utils.info("pytest_cov_failure_threshold: {}".format(pytest_cov_failure_threshold))
 
+
     # Pytest Results
-    
+    is_pytest_passed = pytest_results_handler.is_passed(pytest_results_file)
+    job_summary = pytest_results_handler.generate_md_summary(pytest_results_file)
+    utils.write_msg_to_step_summary(job_summary)
+
     # Pytest Coverage Report
 

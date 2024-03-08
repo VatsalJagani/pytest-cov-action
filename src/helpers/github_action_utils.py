@@ -126,3 +126,9 @@ def execute_system_command(command):
         info(
             f"Command Execution Failed: CMD={command}, ReturnCode={e.returncode}, Output={e.stderr}")
         return e.returncode, e.stderr
+
+
+def write_msg_to_step_summary(msg):
+    prev_job_summary = os.getenv("GITHUB_STEP_SUMMARY")
+    info(f"prev_job_summary = {prev_job_summary}")
+    os.system(f"echo '{msg}' >> $GITHUB_STEP_SUMMARY")
