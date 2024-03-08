@@ -27,14 +27,6 @@ if __name__ == "__main__":
         utils.get_input('pytest_cov_add_to_job_summary'))
     utils.info("pytest_cov_add_to_job_summary: {}".format(pytest_cov_add_to_job_summary))
 
-    pytest_results_pr_status_update = utils.str_to_boolean_default_true(
-        utils.get_input('pytest_results_pr_status_update'))
-    utils.info("pytest_results_pr_status_update: {}".format(pytest_results_pr_status_update))
-
-    pytest_cov_pr_status_update = utils.str_to_boolean_default_true(
-        utils.get_input('pytest_cov_pr_status_update'))
-    utils.info("pytest_cov_pr_status_update: {}".format(pytest_cov_pr_status_update))
-
     pytest_cov_failure_threshold = utils.str_to_boolean_default_true(
         utils.get_input('pytest_cov_failure_threshold'))
     utils.info("pytest_cov_failure_threshold: {}".format(pytest_cov_failure_threshold))
