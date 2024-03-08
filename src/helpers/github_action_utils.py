@@ -129,6 +129,4 @@ def execute_system_command(command):
 
 
 def write_msg_to_step_summary(msg):
-    prev_job_summary = os.getenv("GITHUB_STEP_SUMMARY")
-    info(f"prev_job_summary = {prev_job_summary}")
     os.system(f"echo '{msg}' >> $GITHUB_STEP_SUMMARY")

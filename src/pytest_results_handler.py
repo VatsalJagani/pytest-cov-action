@@ -45,6 +45,7 @@ def parse_pytest_xml(xml_file_path):
 
     return summary
 
+
 def generate_readme(summary):
     readme = f"# Pytest Summary\n\n"
     readme += f":information_source: Total Tests: {summary['total_tests']}\n"
@@ -60,28 +61,28 @@ def generate_readme(summary):
     readme += "|:---------|----------:|\n"
     for test_case in summary['test_cases']:
         if test_case['result'].lower() == "passed":
-            readme += f"| {test_case['name']} | {test_case['duration']:.2f} |"
+            readme += f"| {test_case['name']} | {test_case['duration']:.2f} |\n"
 
 
-    readme += "#### Failed Test-Cases\n\n"
+    if float(summary['failed_tests']) + float(summary['errors'] + float(summary['skipped_tests'])) > 0:
+        readme += "#### Failed Test-Cases\n\n"
 
-    for test_case in summary['test_cases']:
+        for test_case in summary['test_cases']:
+            if test_case['result'].lower() == "passed":
+                continue
 
-        if test_case['result'].lower() == "passed":
-            continue
+            readme += f"* {test_case['name']}\n"
+            readme += f"\t* Result: {test_case['result'].capitalize()}\n"
+            readme += f"\t* Duration: {test_case['duration']:.2f} seconds\n"
 
-        readme += f"* {test_case['name']}\n"
-        readme += f"\t* Result: {test_case['result'].capitalize()}\n"
-        readme += f"\t* Duration: {test_case['duration']:.2f} seconds\n"
+            if test_case['result'] == 'failed':
+                readme += f"\t* Failure Message: {test_case['failure_message']}\n"
+                readme += f"\t* Failure Traceback:\n```\n{test_case['failure_traceback']}\n```\n"
+            elif test_case['result'] == 'error':
+                readme += f"\t* Error Message: {test_case['error_message']}\n"
+                readme += f"\t* Error Traceback:\n```\n{test_case['error_traceback']}\n```\n"
 
-        if test_case['result'] == 'failed':
-            readme += f"\t* Failure Message: {test_case['failure_message']}\n"
-            readme += f"\t* Failure Traceback:\n```\n{test_case['failure_traceback']}\n```\n"
-        elif test_case['result'] == 'error':
-            readme += f"\t* Error Message: {test_case['error_message']}\n"
-            readme += f"\t* Error Traceback:\n```\n{test_case['error_traceback']}\n```\n"
-
-        readme += "\n"
+    readme += "\n"
 
     return readme
 
