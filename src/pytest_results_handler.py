@@ -47,12 +47,12 @@ def parse_pytest_xml(xml_file_path):
 
 def generate_readme(summary):
     readme = f"# Pytest Summary\n\n"
-    readme += f"Total Tests: {summary['total_tests']}\n"
-    readme += f"Passed Tests: {summary['passed_tests']}\n"
-    readme += f"Failed Tests: {summary['failed_tests']}\n"
-    readme += f"Errors: {summary['errors']}\n"
-    readme += f"Skipped Tests: {summary['skipped_tests']}\n"
-    readme += f"Total Time: {summary['total_time']:.2f} seconds\n\n"
+    readme += f":information_source: Total Tests: {summary['total_tests']}\n"
+    readme += f":white_check_mark: Passed Tests: {summary['passed_tests']}\n"
+    readme += f":x: Failed Tests: {summary['failed_tests']}\n"
+    readme += f":x: Errors: {summary['errors']}\n"
+    readme += f":heavy_exclamation_mark: Skipped Tests: {summary['skipped_tests']}\n"
+    readme += f":clock1130: Total Time: {summary['total_time']:.2f} seconds\n\n"
 
     readme += "#### Passed Test-Cases\n\n"
 
