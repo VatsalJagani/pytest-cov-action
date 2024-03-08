@@ -34,16 +34,18 @@ if __name__ == "__main__":
 
     # Pytest Results
     is_pytest_passed = pytest_results_handler.is_passed(pytest_results_file)
+    print(f"is_pytest_passed = {is_pytest_passed}")
     pytest_results_job_summary = pytest_results_handler.generate_md_summary(pytest_results_file)
     utils.write_msg_to_step_summary(pytest_results_job_summary)
 
     # Pytest Coverage Report
     if pytest_cov_file:
         pytest_cov = pytest_cov_report_handler.get_overall_cov(pytest_cov_file)
+        print(f"pytest_overall_cov = {pytest_cov}")
         pytest_cov_job_summary = pytest_cov_report_handler.generate_md_summary(pytest_cov_file)
         utils.write_msg_to_step_summary(pytest_cov_job_summary)
     else:
         utils.info("No pytest coverage report given.")
 
     if not is_pytest_passed or (pytest_cov_file and pytest_cov<pytest_cov_failure_threshold):
-        sys.exit(1)
+        sys.exit(5)
