@@ -54,18 +54,32 @@ def generate_readme(summary):
     readme += f"Skipped Tests: {summary['skipped_tests']}\n"
     readme += f"Total Time: {summary['total_time']:.2f} seconds\n\n"
 
-    readme += "## Test Cases\n\n"
+    readme += "#### Passed Test-Cases\n\n"
+
+    readme += "| Test-Case | Duration (sec) |\n"
+    readme += "|:---------|----------:|\n"
     for test_case in summary['test_cases']:
-        readme += f"### {test_case['name']}\n"
-        readme += f"Result: {test_case['result'].capitalize()}\n"
-        readme += f"Duration: {test_case['duration']:.2f} seconds\n"
+        if test_case['result'].lower() == "passed":
+            readme += f"| {test_case['name']} | {test_case['duration']:.2f} |"
+
+
+    readme += "#### Failed Test-Cases\n\n"
+
+    for test_case in summary['test_cases']:
+
+        if test_case['result'].lower() == "passed":
+            continue
+
+        readme += f"* {test_case['name']}\n"
+        readme += f"\t* Result: {test_case['result'].capitalize()}\n"
+        readme += f"\t* Duration: {test_case['duration']:.2f} seconds\n"
 
         if test_case['result'] == 'failed':
-            readme += f"Failure Message: {test_case['failure_message']}\n"
-            readme += f"Failure Traceback:\n```\n{test_case['failure_traceback']}\n```\n"
+            readme += f"\t* Failure Message: {test_case['failure_message']}\n"
+            readme += f"\t* Failure Traceback:\n```\n{test_case['failure_traceback']}\n```\n"
         elif test_case['result'] == 'error':
-            readme += f"Error Message: {test_case['error_message']}\n"
-            readme += f"Error Traceback:\n```\n{test_case['error_traceback']}\n```\n"
+            readme += f"\t* Error Message: {test_case['error_message']}\n"
+            readme += f"\t* Error Traceback:\n```\n{test_case['error_traceback']}\n```\n"
 
         readme += "\n"
 

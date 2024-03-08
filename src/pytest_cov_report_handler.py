@@ -75,7 +75,7 @@ def generate_readme(summary):
     readme += f"Covered Lines: {summary['covered_lines']}\n"
     readme += f"Coverage Percentage: {summary['coverage_percentage']:.2f}%\n\n"
 
-    readme += "## Packages\n\n"
+    readme += "\n\n"
     readme += "| Package | File | Total Lines | Covered Lines | Coverage Percentage |\n"
     readme += "|:---------|:-------------|-------------:|---------------:|----------------------:|\n"
     for package_name in summary['packages']:
