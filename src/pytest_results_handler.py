@@ -53,10 +53,10 @@ def generate_readme(summary, show_passing_test_cases=False):
     readme += f":x: Failed Tests: {summary['failed_tests']}\n"
     readme += f":x: Errors: {summary['errors']}\n"
     readme += f":heavy_exclamation_mark: Skipped Tests: {summary['skipped_tests']}\n"
-    readme += f":clock1130: Total Time: {summary['total_time']:.2f} seconds\n\n"
+    readme += f":clock1130: Total Time: {summary['total_time']:.2f} seconds\n\n\n"
 
     if show_passing_test_cases:
-        readme += "#### Passed Test-Cases\n\n"
+        readme += "### Passed Test-Cases\n\n"
 
         readme += "| Test-Case | Duration (sec) |\n"
         readme += "|:---------|----------:|\n"
@@ -68,7 +68,7 @@ def generate_readme(summary, show_passing_test_cases=False):
 
 
     if float(summary['failed_tests']) + float(summary['errors'] + float(summary['skipped_tests'])) > 0:
-        readme += "#### Failed Test-Cases\n\n"
+        readme += "### Failed Test-Cases\n\n"
 
         for test_case in summary['test_cases']:
             if test_case['result'].lower() == "passed":
@@ -79,13 +79,15 @@ def generate_readme(summary, show_passing_test_cases=False):
             readme += f"\t* Duration: {test_case['duration']:.2f} seconds\n"
 
             if test_case['result'] == 'failed':
-                readme += f"\t* Failure Message: {test_case['failure_message']}\n"
-                readme += f"\t* Failure Traceback:\n```\n{test_case['failure_traceback']}\n```\n"
+                # readme += f"\t* Failure Message: {test_case['failure_message']}\n"
+                # readme += f"\t* Failure Traceback:\n```\n{test_case['failure_traceback']}\n```\n"
+                readme += f"\n```\n{test_case['failure_traceback']}\n```\n"
             elif test_case['result'] == 'error':
-                readme += f"\t* Error Message: {test_case['error_message']}\n"
-                readme += f"\t* Error Traceback:\n```\n{test_case['error_traceback']}\n```\n"
+                # readme += f"\t* Error Message: {test_case['error_message']}\n"
+                # readme += f"\t* Error Traceback:\n```\n{test_case['error_traceback']}\n```\n"
+                readme += f"\n```\n{test_case['error_traceback']}\n```\n"
 
-    readme += "\n"
+    readme += "\n\n"
 
     return readme
 
