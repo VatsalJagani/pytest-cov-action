@@ -27,8 +27,7 @@ if __name__ == "__main__":
         utils.get_input('pytest_cov_add_to_job_summary'))
     utils.info("pytest_cov_add_to_job_summary: {}".format(pytest_cov_add_to_job_summary))
 
-    pytest_cov_failure_threshold = utils.str_to_boolean_default_true(
-        utils.get_input('pytest_cov_failure_threshold'))
+    pytest_cov_failure_threshold = float(utils.get_input('pytest_cov_failure_threshold'))
     utils.info("pytest_cov_failure_threshold: {}".format(pytest_cov_failure_threshold))
 
 
@@ -41,7 +40,7 @@ if __name__ == "__main__":
     # Pytest Coverage Report
     if pytest_cov_file:
         pytest_cov = pytest_cov_report_handler.get_overall_cov(pytest_cov_file)
-        print(f"pytest_overall_cov = {pytest_cov}")
+        print(f"pytest_overall_cov = {pytest_cov} %")
         pytest_cov_job_summary = pytest_cov_report_handler.generate_md_summary(pytest_cov_file)
         utils.write_msg_to_step_summary(pytest_cov_job_summary)
     else:
