@@ -79,12 +79,14 @@ def generate_readme(summary):
     readme += "| Package | File | Total Lines | Covered Lines | Coverage Percentage |\n"
     readme += "|:---------|:-------------|-------------:|---------------:|----------------------:|\n"
     for package_name in summary['packages']:
-        readme += f"| **{package_name.replace('_', '\\_')}** | | "\
+        _escaped_package_name = package_name.replace('_', '\\_')
+        readme += f"| **{_escaped_package_name}** | | "\
             f"**{summary['packages'][package_name]['total_lines']}** | **{summary['packages'][package_name]['covered_lines']}** | "\
             f"**{summary['packages'][package_name]['coverage_percentage']:.2f}%** |\n"
 
         for file_name in summary['packages'][package_name]['files']:
-            readme += f"| | {file_name.replace('_', '\\_')} | "\
+            _escaped_file_name = file_name.replace('_', '\\_')
+            readme += f"| | {_escaped_file_name} | "\
             f"{summary['packages'][package_name]['files'][file_name]['total_lines']} | {summary['packages'][package_name]['files'][file_name]['covered_lines']} | "\
             f"{summary['packages'][package_name]['files'][file_name]['coverage_percentage']:.2f}% |\n"
 
