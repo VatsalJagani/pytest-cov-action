@@ -23,6 +23,12 @@ GitHub Action to add for Pytest and Pytest Coverage Report in GitHub Action Summ
       if: ${{ always() }}
     ```
 
+* Screenshot - Pytest-cases Passing
+    * ![Pytests Passing](/images/pytest_passing.png)
+
+* Screenshot - Pytest-cases Failing
+    * ![Pytests Failing](/images/pytest_failing.png)
+
 
 
 ## Inputs
