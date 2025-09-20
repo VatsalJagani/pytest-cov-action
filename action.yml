@@ -71,5 +71,12 @@ runs:
 
     - name: "Running the GitHub action for pytest and pytest-cov reports analysis."
       shell: bash
+      env:
+        INPUT_PYTEST_RESULTS_FILE: ${{ inputs.pytest_results_file }}
+        INPUT_PYTEST_COV_FILE: ${{ inputs.pytest_cov_file }}
+        INPUT_PYTEST_RESULTS_ADD_TO_JOB_SUMMARY: ${{ inputs.pytest_results_add_to_job_summary }}
+        INPUT_PYTEST_COV_ADD_TO_JOB_SUMMARY: ${{ inputs.pytest_cov_add_to_job_summary }}
+        INPUT_PYTEST_COV_FAILURE_THRESHOLD: ${{ inputs.pytest_cov_failure_threshold }}
+        INPUT_SHOW_PASSING_TEST_CASES: ${{ inputs.show_passing_test_cases }}
       run: |
         python -u ${{ github.action_path }}/src/main.py
