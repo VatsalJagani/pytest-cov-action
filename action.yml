@@ -58,31 +58,25 @@ runs:
         ref: ${{ steps.extract_branch.outputs.branch }}
         path: repodir
 
-    - name: "Pre-tasks"
-      shell: bash
-      run: |
-        pwd
-        echo "=== Inputs ==="
-        echo "pytest_results_file -> ${{inputs.pytest_results_file}}"
-        echo "pytest_cov_file -> ${{inputs.pytest_cov_file}}"
-        echo "pytest_results_add_to_job_summary -> ${{inputs.pytest_results_add_to_job_summary}}"
-        echo "pytest_cov_add_to_job_summary -> ${{inputs.pytest_cov_add_to_job_summary}}"
-        echo "pytest_cov_failure_threshold -> ${{inputs.pytest_cov_failure_threshold}}"
-        echo "show_passing_test_cases -> ${{inputs.show_passing_test_cases}}"
-
     - name: "Install Python"
       uses: actions/setup-python@v5
       with:
         python-version: '3.11'
 
+    - name: "Install dependencies"
+      shell: bash
+      run: |
+        python -m pip install --upgrade pip
+        python -m pip install github_action_toolkit
+
     - name: "Running the GitHub action for pytest and pytest-cov reports analysis."
       shell: bash
       env:
-        PYTEST_pytest_results_file: ${{inputs.pytest_results_file}}
-        PYTEST_pytest_cov_file: ${{inputs.pytest_cov_file}}
-        PYTEST_pytest_results_add_to_job_summary: ${{inputs.pytest_results_add_to_job_summary}}
-        PYTEST_pytest_cov_add_to_job_summary: ${{inputs.pytest_cov_add_to_job_summary}}
-        PYTEST_pytest_cov_failure_threshold: ${{inputs.pytest_cov_failure_threshold}}
-        PYTEST_show_passing_test_cases: ${{inputs.show_passing_test_cases}}
+        INPUT_PYTEST_RESULTS_FILE: ${{ inputs.pytest_results_file }}
+        INPUT_PYTEST_COV_FILE: ${{ inputs.pytest_cov_file }}
+        INPUT_PYTEST_RESULTS_ADD_TO_JOB_SUMMARY: ${{ inputs.pytest_results_add_to_job_summary }}
+        INPUT_PYTEST_COV_ADD_TO_JOB_SUMMARY: ${{ inputs.pytest_cov_add_to_job_summary }}
+        INPUT_PYTEST_COV_FAILURE_THRESHOLD: ${{ inputs.pytest_cov_failure_threshold }}
+        INPUT_SHOW_PASSING_TEST_CASES: ${{ inputs.show_passing_test_cases }}
       run: |
         python -u ${{ github.action_path }}/src/main.py
