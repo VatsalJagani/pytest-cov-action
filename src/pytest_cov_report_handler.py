@@ -86,11 +86,11 @@ def generate_summary(coverage_data, summary: JobSummary):
     for package_name in coverage_data['packages']:
         # Add package row
         table_data.append([
-            f"**{package_name}**",
+            f"<b>{package_name}</b>",
             "",
-            f"**{coverage_data['packages'][package_name]['total_lines']}**",
-            f"**{coverage_data['packages'][package_name]['covered_lines']}**",
-            f"**{coverage_data['packages'][package_name]['coverage_percentage']:.2f}%**"
+            f"<b>{coverage_data['packages'][package_name]['total_lines']}</b>",
+            f"<b>{coverage_data['packages'][package_name]['covered_lines']}</b>",
+            f"<b>{coverage_data['packages'][package_name]['coverage_percentage']:.2f}%</b>"
         ])
         
         # Add file rows
