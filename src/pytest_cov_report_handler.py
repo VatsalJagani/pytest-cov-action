@@ -1,5 +1,6 @@
 import xml.etree.ElementTree as ET
 import sys
+from github_action_toolkit import JobSummary
 
 def parse_coverage_xml(xml_file_path):
     tree = ET.parse(xml_file_path)
@@ -69,34 +70,38 @@ def parse_coverage_xml(xml_file_path):
     return summary
 
 
-def generate_readme(summary):
-    readme = f"# Pytest Coverage Summary\n\n"
-    readme += f"Total Lines: {summary['total_lines']}\n"
-    readme += f"Covered Lines: {summary['covered_lines']}\n"
-    readme += f"Coverage Percentage: {summary['coverage_percentage']:.2f}%\n\n"
+def generate_summary(coverage_data, summary: JobSummary):
+    summary.add_heading("Pytest Coverage Summary", 1)
+    summary.add_list([
+        f"Total Lines: {coverage_data['total_lines']}",
+        f"Covered Lines: {coverage_data['covered_lines']}",
+        f"Coverage Percentage: {coverage_data['coverage_percentage']:.2f}%"
+    ])
 
-    readme += "\n\n"
-    readme += "| Package | File | Total Lines | Covered Lines | Coverage Percentage |\n"
-    readme += "|:---------|:-------------|-------------:|---------------:|----------------------:|\n"
-    for package_name in summary['packages']:
-        _escaped_package_name = package_name.replace('_', '\\_')
-        readme += f"| **{_escaped_package_name}** | | "\
-            f"**{summary['packages'][package_name]['total_lines']}** | **{summary['packages'][package_name]['covered_lines']}** | "\
-            f"**{summary['packages'][package_name]['coverage_percentage']:.2f}%** |\n"
+    summary.add_break()
 
-        for file_name in summary['packages'][package_name]['files']:
-            _escaped_file_name = file_name.replace('_', '\\_')
-            readme += f"| | {_escaped_file_name} | "\
-            f"{summary['packages'][package_name]['files'][file_name]['total_lines']} | {summary['packages'][package_name]['files'][file_name]['covered_lines']} | "\
-            f"{summary['packages'][package_name]['files'][file_name]['coverage_percentage']:.2f}% |\n"
-
-    return readme
-
-
-def get_overall_cov(pytest_cov_report_file):
-    summary = parse_coverage_xml(pytest_cov_report_file)
-    return summary['coverage_percentage']
-
-def generate_md_summary(pytest_cov_report_file):
-    summary = parse_coverage_xml(pytest_cov_report_file)
-    return generate_readme(summary)
+    # Create table data
+    table_data = [["Package", "File", "Total Lines", "Covered Lines", "Coverage Percentage"]]
+    
+    for package_name in coverage_data['packages']:
+        # Add package row
+        table_data.append([
+            f"**{package_name}**",
+            "",
+            f"**{coverage_data['packages'][package_name]['total_lines']}**",
+            f"**{coverage_data['packages'][package_name]['covered_lines']}**",
+            f"**{coverage_data['packages'][package_name]['coverage_percentage']:.2f}%**"
+        ])
+        
+        # Add file rows
+        for file_name in coverage_data['packages'][package_name]['files']:
+            table_data.append([
+                "",
+                file_name,
+                str(coverage_data['packages'][package_name]['files'][file_name]['total_lines']),
+                str(coverage_data['packages'][package_name]['files'][file_name]['covered_lines']),
+                f"{coverage_data['packages'][package_name]['files'][file_name]['coverage_percentage']:.2f}%"
+            ])
+    
+    summary.add_table(table_data)
+    return summary

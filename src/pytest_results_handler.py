@@ -1,11 +1,12 @@
 import xml.etree.ElementTree as ET
+from github_action_toolkit import JobSummary
 
 
 def parse_pytest_xml(xml_file_path):
     tree = ET.parse(xml_file_path)
     root = tree.getroot()
 
-    summary = {
+    result = {
         'total_tests': 0,
         'passed_tests': 0,
         'failed_tests': 0,
@@ -16,89 +17,80 @@ def parse_pytest_xml(xml_file_path):
     }
 
     for testcase in root.iter('testcase'):
-        summary['total_tests'] += 1
+        result['total_tests'] += 1
         test_case = {
             'name': testcase.get('classname') + '.' + testcase.get('name'),
             'result': 'passed',
             'duration': float(testcase.get('time'))
         }
 
-        summary['total_time'] += test_case['duration']
+        result['total_time'] += test_case['duration']
 
         failure = testcase.find('failure')
         error = testcase.find('error')
         if failure is not None:
-            summary['failed_tests'] += 1
+            result['failed_tests'] += 1
             test_case['result'] = 'failed'
             test_case['failure_message'] = failure.get('message')
             test_case['failure_traceback'] = failure.text.strip()
         elif error is not None:
-            summary['errors'] += 1
+            result['errors'] += 1
             test_case['result'] = 'error'
             test_case['error_message'] = error.get('message')
             test_case['error_traceback'] = error.text.strip()
 
-        summary['test_cases'].append(test_case)
+        result['test_cases'].append(test_case)
 
-    summary['passed_tests'] = summary['total_tests'] - summary['failed_tests'] - summary['errors']
-    summary['skipped_tests'] = len(list(root.iter('skipped')))
+    result['passed_tests'] = result['total_tests'] - result['failed_tests'] - result['errors']
+    result['skipped_tests'] = len(list(root.iter('skipped')))
 
-    return summary
+    return result
 
 
-def generate_readme(summary, show_passing_test_cases=False):
-    readme = f"# Pytest Summary\n\n"
-    readme += f":information_source: Total Tests: {summary['total_tests']}\n"
-    readme += f":white_check_mark: Passed Tests: {summary['passed_tests']}\n"
-    readme += f":x: Failed Tests: {summary['failed_tests']}\n"
-    readme += f":x: Errors: {summary['errors']}\n"
-    readme += f":heavy_exclamation_mark: Skipped Tests: {summary['skipped_tests']}\n"
-    readme += f":clock1130: Total Time: {summary['total_time']:.2f} seconds\n\n\n"
+def generate_summary(pytest_result, summary: JobSummary, show_passing_test_cases=False):
+    summary.add_heading("Pytest Summary", 1)
+    summary.add_list([
+        f":information_source: Total Tests: {pytest_result['total_tests']}",
+        f":white_check_mark: Passed Tests: {pytest_result['passed_tests']}",
+        f":x: Failed Tests: {pytest_result['failed_tests']}",
+        f":x: Errors: {pytest_result['errors']}",
+        f":heavy_exclamation_mark: Skipped Tests: {pytest_result['skipped_tests']}",
+        f":clock1130: Total Time: {pytest_result['total_time']:.2f} seconds"
+    ])
+
+    summary.add_break()
 
     if show_passing_test_cases:
-        readme += "### Passed Test-Cases\n\n"
+        summary.add_heading("Passed Test-Cases", 3)
 
-        readme += "| Test-Case | Duration (sec) |\n"
-        readme += "|:---------|----------:|\n"
-        for test_case in summary['test_cases']:
-            if test_case['result'].lower() == "passed":
-                readme += f"| {test_case['name']} | {test_case['duration']:.2f} |\n"
+        summary.add_table([
+            ["Test-Case", "Duration (sec)"],
+            *[
+                [test_case['name'], f"{test_case['duration']:.2f}"]
+                for test_case in pytest_result['test_cases']
+                if test_case['result'].lower() == "passed"
+            ]
+        ])
+        summary.add_break()
 
-        readme += "\n"
+    if float(pytest_result['failed_tests']) + float(pytest_result['errors']) + float(pytest_result['skipped_tests']) > 0:
 
+        summary.add_heading("Failed/Test-Cases", 2)
 
-    if float(summary['failed_tests']) + float(summary['errors'] + float(summary['skipped_tests'])) > 0:
-        readme += "### Failed Test-Cases\n\n"
+        summary.add_table([
+            ["Test-Case", "Result", "Duration (sec)", "Details"],
+            *[
+                [
+                    test_case['name'],
+                    test_case['result'].capitalize(),
+                    f"{test_case['duration']:.2f}",
+                    f"```\n{test_case['failure_traceback'] if test_case['result']=='failed' else test_case['error_traceback']}\n```"
+                ]
+                for test_case in pytest_result['test_cases']
+                if test_case['result'].lower() in ["failed", "error"]
+            ]
+        ])
 
-        for test_case in summary['test_cases']:
-            if test_case['result'].lower() == "passed":
-                continue
+        summary.add_break()
 
-            readme += f"* {test_case['name']}\n"
-            readme += f"\t* Result: {test_case['result'].capitalize()}\n"
-            readme += f"\t* Duration: {test_case['duration']:.2f} seconds\n"
-
-            if test_case['result'] == 'failed':
-                # readme += f"\t* Failure Message: {test_case['failure_message']}\n"
-                # readme += f"\t* Failure Traceback:\n```\n{test_case['failure_traceback']}\n```\n"
-                readme += f"\n```\n{test_case['failure_traceback']}\n```\n\n"
-            elif test_case['result'] == 'error':
-                # readme += f"\t* Error Message: {test_case['error_message']}\n"
-                # readme += f"\t* Error Traceback:\n```\n{test_case['error_traceback']}\n```\n"
-                readme += f"\n```\n{test_case['error_traceback']}\n```\n\n"
-
-    readme += "\n\n"
-
-    return readme
-
-
-def generate_md_summary(pytest_results_file, show_passing_test_cases=False):
-    summary = parse_pytest_xml(pytest_results_file)
-    return generate_readme(summary, show_passing_test_cases=show_passing_test_cases)
-
-
-def is_passed(pytest_results_file):
-    summary = parse_pytest_xml(pytest_results_file)
-    if summary['failed_tests'] == 0:
-        return True
-    return False
+    return summary
