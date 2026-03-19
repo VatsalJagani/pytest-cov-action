@@ -60,12 +60,14 @@ def parse_coverage_xml(xml_file_path):
 
 
     for package in summary['packages']:
-        summary['packages'][package]['coverage_percentage'] = \
-            float(summary['packages'][package]['covered_lines'] / summary['packages'][package]['total_lines']) * 100
-    
-        for source_file in summary['packages'][package]['files']:
-            summary['packages'][package]['files'][source_file]['coverage_percentage'] = \
-                float(summary['packages'][package]['files'][source_file]['covered_lines'] / summary['packages'][package]['files'][source_file]['total_lines']) * 100
+        pkg = summary['packages'][package]
+        pkg['coverage_percentage'] = \
+            float(pkg['covered_lines'] / pkg['total_lines']) * 100 if pkg['total_lines'] > 0 else 100.0
+
+        for source_file in pkg.get('files', {}):
+            file_dict = pkg['files'][source_file]
+            file_dict['coverage_percentage'] = \
+                float(file_dict['covered_lines'] / file_dict['total_lines']) * 100 if file_dict['total_lines'] > 0 else 100.0
 
     return summary
 
